@@ -12,6 +12,7 @@ int getInteger();
 void decimalToBinary(int decValue, char binString[]);
 void decimalToHex(int decValue, char hexString[]);
 void decimalToOct(int decValue, char octString[]);
+int saveFile(char name[], char date[], int decValue, char octString[], char hexString[], char binString[]);
 
 int main() 
 {
@@ -28,7 +29,8 @@ int main()
     strcpy(dateTime, getDateAndTime());
 
     // prompt user for name
-    // TODO: Implement prompt for name
+    printf("Please enter your name: ");
+    scanf("%s", name);
 
     decVal = getInteger();
 
@@ -48,11 +50,11 @@ int main()
     printf("Hexidecimal: %s\n", hexString);
 
     // save the file
-    //saveSuccess = saveFile(name, dateTime, decVal, octString, hexString, binString);
-    //if (!saveSuccess) // equivalent to: if (saveSuccess == 0)
-        //return 1;
+    saveSuccess = saveFile(name, dateTime, decVal, octString, hexString, binString);
+    if (!saveSuccess) // equivalent to: if (saveSuccess == 0)
+        return 1;
 
-    //return 0;
+    return 0;
 }
 
 char *getDateAndTime(void) //prove date and time
@@ -171,6 +173,44 @@ void decimalToOct(int decValue, char octString[]) //conversion to octal
 
 int saveFile(char name[], char date[], int decValue, char octString[], char hexString[], char binString[])
 {
-    
+    FILE *outputFile;
+    char fileName[32];
+    char affirm[8];
+
+    printf("Would you like to save these results to a file? (Y/N) --> "); //prompt if user wants file created
+    scanf("%s", affirm);
+
+    if (affirm[0] == 'Y' || affirm[0] == 'y') //if y input
+    {
+        printf("Pleas enter a name for the file: ");
+        fgets(fileName, sizeof(fileName), stdin); //create file
+        fileName[strcspn(fileName, "\n")] = '\0'; //remove newline 
+
+        outputFile = fopen(fileName, "a"); //open file for changing
+
+        if (outputFile == NULL) // error handling with file opening
+        {
+            printf("Error opening file: %s", fileName);
+            return 0;
+        }
+
+        //appending
+        fprintf(outputFile, "%s\n", name);
+        fprintf(outputFile, "%s\n\n", date);
+        fprintf(outputFile,"Decimal: %d\n", decValue);
+        fprintf(outputFile, "Octal: %s\n", octString);
+        fprintf(outputFile, "Hexadecimal: %s\n", hexString);
+        fprintf(outputFile, "Binary: %s\n", binString);
+
+        fclose(outputFile); //close file
+
+
+    }
+    else //N or n is inputted 
+    {
+        printf("No file created.");
+        return 0;
+    }
+    return 1;
 }
 
