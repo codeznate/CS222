@@ -30,7 +30,8 @@ int main()
 
     // prompt user for name
     printf("Please enter your name: ");
-    scanf("%s", name);
+    fgets(name, sizeof(name), stdin);
+    name[strcspn(name, "\n")] = '\0';
 
     decVal = getInteger();
 
@@ -178,7 +179,8 @@ int saveFile(char name[], char date[], int decValue, char octString[], char hexS
     char affirm[8];
 
     printf("Would you like to save these results to a file? (Y/N) --> "); //prompt if user wants file created
-    scanf("%s", affirm);
+    fgets(affirm, sizeof(affirm), stdin);
+    affirm[strcspn(affirm, "\n")] = '\0';
 
     if (affirm[0] == 'Y' || affirm[0] == 'y') //if y input
     {
@@ -190,7 +192,7 @@ int saveFile(char name[], char date[], int decValue, char octString[], char hexS
 
         if (outputFile == NULL) // error handling with file opening
         {
-            printf("Error opening file: %s", fileName);
+            printf("Error opening file: %s\n", fileName);
             return 0;
         }
 
@@ -208,7 +210,7 @@ int saveFile(char name[], char date[], int decValue, char octString[], char hexS
     }
     else //N or n is inputted 
     {
-        printf("No file created.");
+        printf("No file created.\n");
         return 0;
     }
     return 1;
