@@ -2,6 +2,20 @@
 //Homework 3
 //G01494888
 
+/* This program takes an input for a name and a number. The number inputted is ouputted to console,
+ * as well as its decimal, binary, hexadecimal, and octal conversions. The program then asks for
+ * results to be stored to a file, and loops until "X" or "x" is entered to stop the loop.
+ *  int main() - Variable declarations, function calls to variables, loop handling to keep program
+ *      running until condition met (anything but 1 is returned, either from program termination
+ *      due to 'x' or 'X' being input, or file not saving correctly)
+ *  getDateAndTime() - Returns date and time in format
+ *  getInteger() - prompts for decimal input in bounds, converts to int using atoi(), outputs to console. 
+ *  decimalToBinary() - Converts decimal from getInteger() to binary format
+ *  decimalToHex() - converts decimal from getInteger() to hex format
+ *  decimalToOct() - converts decimal from getInteger() to octal format
+ *  saveFile() - saves results from name, time, and conversions to a file name of choice
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,39 +38,39 @@ int main()
     int decVal = 0;
     int saveSuccess = 0;
 
-    
-
-    strcpy(dateTime, getDateAndTime());
-
-    // prompt user for name
+    //prompt name
     printf("Please enter your name: ");
     fgets(name, sizeof(name), stdin);
     name[strcspn(name, "\n")] = '\0';
 
-    decVal = getInteger();
+    while (1) 
+    {
+        strcpy(dateTime, getDateAndTime());
 
-    // exit clause
-    if (decVal == -1)
-        return 0;
+        decVal = getInteger();
 
-    // run conversions
-    decimalToBinary(decVal, binString);
-    decimalToHex(decVal, hexString);
-    decimalToOct(decVal, octString);
+        // exit clause
+        if (decVal == -1)
+            return 0;
 
-    // print conversions to the console
-    printf("Decimal: %d\n", decVal);
-    printf("Binary: %s\n", binString);
-    printf("Octal: %s\n", octString);
-    printf("Hexidecimal: %s\n", hexString);
+        // run conversions
+        decimalToBinary(decVal, binString);
+        decimalToHex(decVal, hexString);
+        decimalToOct(decVal, octString);
 
-    // save the file
-    saveSuccess = saveFile(name, dateTime, decVal, octString, hexString, binString);
-    if (!saveSuccess) // equivalent to: if (saveSuccess == 0)
-        return 1;
+        // print conversions to the console
+        printf("Decimal: %d\n", decVal);
+        printf("Binary: %s\n", binString);
+        printf("Octal: %s\n", octString);
+        printf("Hexidecimal: %s\n", hexString);
 
-    return 0;
+        // save the file
+        saveSuccess = saveFile(name, dateTime, decVal, octString, hexString, binString);
+        if (!saveSuccess) // equivalent to: if (saveSuccess == 0)
+            return 1;
+    }
 }
+
 
 char *getDateAndTime(void) //prove date and time
 {
@@ -80,6 +94,7 @@ int getInteger() //input integer
 
         if (buffer[0] == 'x' || buffer[0] == 'X') //check for exit input
         {
+            printf("\nProgram exiting... Goodbye!\n\n");
             return -1;
         }
         
