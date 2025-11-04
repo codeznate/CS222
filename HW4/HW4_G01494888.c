@@ -169,6 +169,9 @@ void generateLocalityReport(int num1, int num2, int count, char name[32])
     else
     {
         printf("Error: No records exist at location %d.%d\n", num1, num2);
+        specifyLocality(&num1, &num2);
+        generateLocalityReport(num1, num2, count, name);
+        return;
     }
 
     //write information to file
@@ -180,13 +183,14 @@ void generateLocalityReport(int num1, int num2, int count, char name[32])
     }
 
     printf("\nStoring data into file '222_Locality_List.txt'...\n");
-    fprintf(fptr, "%s", name);
-    fprintf(fptr, "%s", getDateAndTime());
+    fprintf(fptr, "\n%s\n", name);
+    fprintf(fptr, "%s\n", getDateAndTime());
     fprintf(fptr, "Records at %d.%d:\n", num1, num2);
     for (int i = 0; i < found; i++)
     {
         fprintf(fptr, "%s  %s\n", matches[i].ip, matches[i].name);
     }
     fclose(fptr);
+    printf("Success! Goodbye!\n");
 }
 
