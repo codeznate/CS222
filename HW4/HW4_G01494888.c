@@ -19,7 +19,7 @@
 char *getDateAndTime(void);
 int readDataFile(void);
 int specifyLocality(int *a, int *b);
-void generateLocalityReport(int num1, int num2, int count);
+void generateLocalityReport(int num1, int num2, int count, char name[32]);
 
 /*
     Struct definition for records
@@ -36,7 +36,6 @@ struct address_t records[100]; /* -> global array of records */
 */
 int main()
 {
-    char dateTime[32];
     char name[32];
     int local1, local2, recordsFound;
 
@@ -45,14 +44,12 @@ int main()
     fgets(name, sizeof(name), stdin);
     name[strcspn(name, "\n")] = '\0'; //-> remove newline char
 
-    //date and time
-    strcpy(dateTime, getDateAndTime());
     //read data file and store records found
     recordsFound = readDataFile();
     //specifiy locality 
     specifyLocality(&local1, &local2);
     //locality report
-    generateLocalityReport(local1, local2, recordsFound);
+    generateLocalityReport(local1, local2, recordsFound, name);
 }
 /*
     Function for retrieving current date and time using time library
@@ -139,15 +136,16 @@ int specifyLocality(int *a, int *b)
 /*
     Function for generating locality report and checking matches 
 */
-void generateLocalityReport(int num1, int num2, int count)
+void generateLocalityReport(int num1, int num2, int count, char name[32])
 {
     struct match_t{
         char ip[16];
         char name[11];
     };
     struct match_t matches[100];
-
     int found = 0;
+    FILE *fptr;
+
     for (int i = 0; i < count; i++)
     {
         if (records[i].addr[0] == num1 && records[i].addr[1] == num2)
@@ -172,5 +170,23 @@ void generateLocalityReport(int num1, int num2, int count)
     {
         printf("Error: No records exist at location %d.%d\n", num1, num2);
     }
+
+    //write information to file
+    fptr = fopen("222_Locality_List.txt", "w");
+    if (fptr == NULL)
+    {
+        perror("Error opening file.");
+        return;
+    }
+
+    printf("\nStoring data into file '222_Locality_List.txt'...\n");
+    fprintf(fptr, "%s", name);
+    fprintf(fptr, "%s", getDateAndTime());
+    fprintf(fptr, "Records at %d.%d:\n", num1, num2);
+    for (int i = 0; i < found; i++)
+    {
+        fprintf(fptr, "%s  %s\n", matches[i].ip, matches[i].name);
+    }
+    fclose(fptr);
 }
 
