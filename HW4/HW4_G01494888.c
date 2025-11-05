@@ -2,6 +2,11 @@
     Program that reads from external Inet file and returns found records at locality
     address. Checks for bounds errors between 0-255, and writes results into
     a file for viewing. 
+    
+    Nathaniel Crick
+    G01494888
+    Homework 4 - Locality Report
+    CS222
 */
 
 #include <stdio.h>
