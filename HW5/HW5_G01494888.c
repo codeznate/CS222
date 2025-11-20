@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string.h> 
 #include <ctype.h>
 
 /*
@@ -85,7 +85,7 @@ int readDataFile(void)
 
     while(1)
     {
-        struct address_t *newNode = malloc(sizeof(struct address_t));
+        struct address_t *newNode = malloc(sizeof(struct address_t)); // create node size of structure
         if (!newNode)
         {
             perror("Memory Allocation Failed!\n");
@@ -94,10 +94,16 @@ int readDataFile(void)
         }
 
         int count = fscanf(fptr, "%d.%d.%d.%d %12s", &newNode->octet[0], &newNode->octet[1], &newNode->octet[2],
-            &newNode->octet[3], newNode->alias);
+            &newNode->octet[3], newNode->alias); //scan file and add data to node 
+
+        if (count == EOF) // end of file if sentinel node doesn't exist
+        {
+            free(newNode); //prevent memory leak
+            break;
+        }
 
         if (newNode->octet[0] == 0 && newNode->octet[1] == 0 && newNode->octet[2] == 0 && newNode->octet[3] == 0
-        && strcmp(newNode->alias, "NONE") == 0)
+        && strcmp(newNode->alias, "NONE") == 0) //checking for sentinel record 
         {
             free(newNode);
             break;
@@ -105,10 +111,10 @@ int readDataFile(void)
 
         for (i = 0; newNode->alias[i]; i++)
         {
-            newNode->alias[i] = toupper(newNode->alias[i]); 
+            newNode->alias[i] = toupper(newNode->alias[i]); //convert alias to uppercase 
         }
 
-        newNode->next = head;
+        newNode->next = head; 
         head = newNode;
     }
 }
@@ -153,39 +159,50 @@ int specifyLocality(int *a, int *b)
         break;
     }
 }
-
+/*
+    Function for parsing through file and searching for direct locality matches, and storing into file.
+    -> Parses through file, finding matches.
+    -> If no matches result, recursion occurs to prompt for other inputs. 
+    -> Uses pointers to store value in file.
+*/
 void generateLocalityReport(int num1, int num2, char name[32])
 {
-    struct address_t *curr = head;
     int found = 0;
     FILE *fptr;
-
-    fptr = fopen("222_Locality_List", "w");
-    fprintf(fptr,"%s\n", name);
-    fprintf(fptr,"%s\n", getDateAndTime());
-    fprintf(fptr,"Records at %d.%d:\n", num1, num2);
-
-    while(curr != NULL)
+    while(1)
     {
-        if (curr->octet[0] == num1 && curr->octet[1] == num2)
+        struct address_t *curr = head; //assign curr to head node 
+
+        fptr = fopen("222_Locality_List", "w"); //create / overwrite file 
+        fprintf(fptr,"%s\n", name);
+        fprintf(fptr,"%s\n", getDateAndTime());
+        fprintf(fptr,"Records at %d.%d:\n", num1, num2);
+
+        while(curr != NULL) //until nodes are iterated fully 
         {
-            printf("%d.%d.%d.%d %12s\n", curr->octet[0], curr->octet[1], curr->octet[2], curr->octet[3],
-                curr->alias);
-            found += 1; 
-            fprintf(fptr, "%d.%d.%d.%d %s\n", curr->octet[0], curr->octet[1], curr->octet[2], curr->octet[3], curr->alias);
+            if (curr->octet[0] == num1 && curr->octet[1] == num2) // matching
+            {
+                printf("%d.%d.%d.%d %12s\n", curr->octet[0], curr->octet[1], curr->octet[2], curr->octet[3],
+                    curr->alias); //print to console
+                found += 1; 
+                //write to file 
+                fprintf(fptr, "%d.%d.%d.%d %s\n", curr->octet[0], curr->octet[1], curr->octet[2], curr->octet[3], curr->alias);
+            }
+            curr = curr->next; //point to next node 
         }
-        curr = curr->next;
-    }
+        fclose(fptr);
 
-    if (found == 0)
-    {
-        printf("No records exist at %d.%d\n", num1, num2);
-        specifyLocality(&num1, &num2);
-        generateLocalityReport(num1, num2, name);
+        if (found)
+        {
+            printf("\nSuccessfully stored data within 222_Locality_List!\n");
+            printf("Goodbye!\n");
+            break;
+        }
+
+        printf("\nNo records found at %d.%d", num1, num2);
+
+        specifyLocality(&num1, &num2); //recursion if no matches found
     }
-    fclose(fptr);
-    printf("\nData successfully stored within 222_Locality_List!\n");
-    printf("Goodbye!\n");
 }
 
 
